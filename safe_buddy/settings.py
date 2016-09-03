@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'oauth2_provider',
-    'rest_framework'
+    'rest_framework',
+    'users',
+    'misc',
 
 ]
 
@@ -123,10 +125,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
-
 STATIC_URL = '/static/'
-
-
+STATICFILES_DIRS = (
+'/var/www/python/safe_buddy/safe_buddy/static',
+)
 
 
 REST_FRAMEWORK = {
@@ -145,3 +147,12 @@ OAUTH2_PROVIDER = {
 
 
 DEFAULT_FROM_EMAIL = 'admin@safebuddy.com'
+
+
+AUTH_PROFILE_MODULE = 'users.UserProfile'
+
+
+
+API_ERRORS = {
+    'USER_DOES_NOT_EXISTS' : 'Requested user does not exists',
+}

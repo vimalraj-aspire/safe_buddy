@@ -1,13 +1,14 @@
 from rest_framework import serializers
 from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth.models import User
+from models import UserProfile
 from safe_buddy import settings
+from django.contrib.auth.models import User
 
-class SBUserSerializer(serializers.ModelSerializer):
-  
+class UserSerializer(serializers.ModelSerializer):
+
   class Meta:
     model = User
-    fields = ('id', 'password', 'first_name', 'last_name', 'email', 'username')
+    fields = ('id', 'password', 'first_name',  'email', 'username')
     extra_kwargs = {'password': {'write_only': True}}
     readonly_fields = ('is_active', 'date_joined')
 
@@ -18,11 +19,27 @@ class SBUserSerializer(serializers.ModelSerializer):
     user.save()
     return user
 
+class SBUserSerializer(serializers.ModelSerializer):
 
+  class Meta:
+    model = UserProfile
+    fields = ('aceid', 'profile_picture', 'user')
+    user = serializers.Field(source='user.id')
+
+
+  def to_representation(self, instance):
+      data = super(SBUserSerializer, self).to_representation(instance)
+      data['first_name'] = instance.user.first_name
+      data['email'] = instance.user.email
+      data['username'] = instance.user.username
+      if data['profile_picture'] and 'http' in data['profile_picture']:
+        data['profile_picture'] = '/'.join(data['profile_picture'].split('/')[5:])
+      data.pop('user')
+      return data
+    
 
 class PasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField()
-
     password_reset_form_class = PasswordResetForm
 
     def is_valid(self):

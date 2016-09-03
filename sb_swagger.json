@@ -1,0 +1,298 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Safe buddy - API",
+        "description": "API doc for safebuddy application",
+        "version": "1.0.1"
+    },
+    "host": "localhost",
+    "schemes": [
+        "http"
+    ],
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "basePath": "/api",
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/users/": {
+            "get": {
+                "summary": "Return the user details",
+                "description": "This endpoint returns the details of all users in system\n",
+                "tags": [
+                    "Users"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of employee details",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/user"
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Creates a user",
+                "description": "Creates a user, this endpoint accepts multipart encoding.",
+                "tags": [
+                    "Users"
+                ],
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "formData",
+                        "description": "Email id of the user",
+                        "required": true,
+                        "type": "number",
+                        "format": "double"
+                    },
+                    {
+                        "name": "first_name",
+                        "in": "formData",
+                        "description": "Firstname of the user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "aceid",
+                        "in": "formData",
+                        "description": "ACEID of the user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "Passsword of the user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "user_name",
+                        "in": "formData",
+                        "description": "User name of the user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "profile_picture",
+                        "in": "formData",
+                        "description": "Profile picture of the user",
+                        "required": true,
+                        "type": "file"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "An array of employee details",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/user"
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{username}/": {
+            "get": {
+                "summary": "user instance",
+                "description": "return user instance\n",
+                "tags": [
+                    "Users"
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "user's mobile number.",
+                        "required": true,
+                        "type": "number",
+                        "format": "double"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user instance",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/user"
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/password-reset/": {
+            "get": {
+                "summary": "reset user password",
+                "description": "reset user password\n",
+                "tags": [
+                    "Users"
+                ],
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "formData",
+                        "description": "user's email id.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/misc-contacts": {
+            "get": {
+                "summary": "List important contact numbers",
+                "description": "API to return contact numbers | you can add more contacts at admin/misc/contact/ | credential- admin/aspire@123",
+                "tags": [
+                    "Misc"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Info about contact",
+                        "schema": {
+                            "$ref": "#/definitions/contact"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/safety-tips": {
+            "get": {
+                "summary": "List safety tips and tricks",
+                "description": "API to return safety tips and tricks | you can add more safety at admin/misc/safetytip/  | credential- admin/aspire@123",
+                "tags": [
+                    "Misc"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Info about contact",
+                        "schema": {
+                            "$ref": "#/definitions/safety-tip"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "contact": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "contact person name"
+                },
+                "number": {
+                    "type": "string",
+                    "description": "contact number"
+                }
+            }
+        },
+        "safety-tip": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string",
+                    "description": "safety text"
+                },
+                "image": {
+                    "type": "string",
+                    "description": "image slug"
+                }
+            }
+        },
+        "user": {
+            "type": "object",
+            "properties": {
+                "aceid": {
+                    "type": "string",
+                    "description": "Aspires's unique identification number"
+                },
+                "profile_picture": {
+                    "type": "string",
+                    "description": "Profile picture of the user."
+                },
+                "first_name": {
+                    "type": "string",
+                    "description": "name of user"
+                },
+                "username": {
+                    "type": "string",
+                    "description": "username of the user"
+                },
+                "email": {
+                    "type": "string",
+                    "description": "email of the user"
+                }
+            }
+        },
+        "Error": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
