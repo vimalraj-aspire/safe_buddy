@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^api/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^api/', include('users.urls')),
     url(r'^api/', include('misc.urls')),
+    url(r'^api/', include('location.urls')),
 ]

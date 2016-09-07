@@ -57,6 +57,8 @@ class SBUserList(APIView):
             if serializer.is_valid():
                 employee = serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+              user.delete()
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -75,21 +77,18 @@ class PasswordResetView(GenericAPIView):
                 status=400
             )
 
-
-
-
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 @permission_classes((IsAuthenticated, ))
 def add_trackee(request, username):
   ''' Function to add add trackee'''
-  try:
+  try:    
     userprofile = UserProfile.objects.get(user=request.user)
     trackee = UserProfile.objects.get(user__username=username)
-    friend = Friend.objects.filter(user=userprofile, friend=trackee)
+    friend = Friend.objects.filter(user_profile=userprofile, friend_profile=trackee)
     if friend:
         return Response({'status': 'failed', 'msg': 'Already the user is in trackee list'}, status=status.HTTP_404_NOT_FOUND)
     else:
-         Friend.objects.create(user=userprofile, friend=trackee)
+         Friend.objects.create(user_profile=userprofile, friend_profile=trackee)
          return Response({'status': 'success', 'msg': 'User has been added in trackee list'}, status=status.HTTP_404_NOT_FOUND)
   except UserProfile.DoesNotExist:
     return Response({'status': 'failed', 'msg': settings.API_ERRORS.get('USER_DOES_NOT_EXISTS')}, status=status.HTTP_404_NOT_FOUND)
@@ -101,9 +100,25 @@ def my_trackees(request):
     trackees = Friend.objects.filter(user_profile=userprofile)
     if trackees:
       serializer = FriendSertializer(trackees, many=True)
-      import pdb
-      pdb.set_trace()
-
       return Response(serializer.data)
     else:
-      return Response({'status': 'faliled', 'msg': 'No trackee found'}, status=status.HTTP_404_NOT_FOUND)
+      return Response({'status': 'failed', 'msg': 'No trackee found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated, ))
+def who_are_all_tracking_me(request):
+    userprofile = UserProfile.objects.get(user=request.user)
+    trackers = Friend.objects.filter(friend_profile=userprofile)
+    if trackers:
+      serializer = FriendSertializer(trackers, many=True)
+      return Response(serializer.data)
+    else:
+      return Response({'status': 'failed', 'msg': 'No trackers found'}, status=status.HTTP_404_NOT_FOUND)
+    # userprofile = UserProfile.objects.get(user=request.user)
+    # trackees = Friend.objects.filter(user_profile=userprofile)
+    # if trackees:
+    #   serializer = FriendSertializer(trackees, many=True)
+    #   return Response(serializer.data)
+    # else:
+    #   return Response({'status': 'faliled', 'msg': 'No trackee found'}, status=status.HTTP_404_NOT_FOUND)
+
