@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "title": "Safe buddy - API",
-        "description": "API doc for safebuddy application",
+        "description": "API doc for safebuddy application | hosted at http://ec2-52-91-230-198.compute-1.amazonaws.com:8000/api/",
         "version": "1.0.1"
     },
     "host": "localhost",
@@ -21,6 +21,56 @@
         "application/json"
     ],
     "paths": {
+        "/token/": {
+            "post": {
+                "summary": "Creates an access token",
+                "description": "Creates an access token, This end point should access with a below authorization header | Authorization - Basic NllMcWZlYjhKb1hqa0J0U2VCVzRvTXVnQWJ1OUpJbDE4QmlmWkVNVTpYOWF0WGxYckdhVDhaRVdGY2c4MTliMjg5amhXakFDVXg3Y2lxQlhvb1V2REVaaDRUWjg4ZmllQWV3dlNKa3ppVDFhZ1lHbGVTQmtiTUt1TmtqZTB1T21jN1hYTzZ4YkFHYTZ4U0hnSVJLNkR3MVFGbXlJMUtjUFZzQ2tMZjZ4Rw==",
+                "tags": [
+                    "Users"
+                ],
+                "parameters": [
+                    {
+                        "name": "grant_type",
+                        "in": "formData",
+                        "description": "give 'password' as value for this field",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "username",
+                        "in": "formData",
+                        "description": "user name  of the user",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "password  of the user",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "An array of employee details",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/oauthresponse"
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+
         "/users/": {
             "get": {
                 "summary": "Return the user details",
@@ -345,6 +395,28 @@
                 }
             }
         },
+
+      "oauthresponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "token_type": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "scope": {
+                    "type": "string"
+                }
+            }
+        },
+
         "user": {
             "type": "object",
             "properties": {
