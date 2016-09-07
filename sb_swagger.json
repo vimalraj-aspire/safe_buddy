@@ -95,6 +95,20 @@
                         "description": "Profile picture of the user",
                         "required": true,
                         "type": "file"
+                    },
+                    {
+                        "name": "user_relation",
+                        "in": "formData",
+                        "description": "Relation of the account hoder to employee , could be FATHER, MOTHER, GAURDIAN",
+                        "required": true,
+                        "type": "file"
+                    },
+                    {
+                        "name": "user_type",
+                        "in": "formData",
+                        "description": "user type, could be EMPLOYEE, PARENT",
+                        "required": true,
+                        "type": "file"
                     }
                 ],
                 "responses": {
@@ -116,7 +130,7 @@
                 }
             }
         },
-        "/user/{username}/": {
+        "/user/{username|aceid}/": {
             "get": {
                 "summary": "user instance",
                 "description": "return user instance\n",
@@ -125,9 +139,9 @@
                 ],
                 "parameters": [
                     {
-                        "name": "username",
+                        "name": "username|aceid",
                         "in": "path",
-                        "description": "user's mobile number.",
+                        "description": "Search avaliable user based on their username and aceid",
                         "required": true,
                         "type": "number",
                         "format": "double"
@@ -223,9 +237,82 @@
                     }
                 }
             }
+        },
+        "/my-trackees/": {
+            "get": {
+                "summary": "List avalable trackees",
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "API to return all available trackees for a  user, should be accessed with authorization header",
+                "tags": [
+                    "Track"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns trackee details",
+                        "schema": {
+                            "$ref": "#/definitions/tracker"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/add-trackee/{username}/": {
+            "get": {
+                "summary": "Add a trackee",
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "API to add a trackee",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "username of the trackee",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "Track"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns trackee details",
+                        "schema": {
+                            "$ref": "#/definitions/tracker"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "tracker": {
+            "type": "object",
+            "properties": {
+                "friend_profile": {
+                    "$ref": "#/definitions/user"
+                }
+            }
+        },
         "contact": {
             "type": "object",
             "properties": {

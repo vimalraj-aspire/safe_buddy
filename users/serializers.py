@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.forms import PasswordResetForm
-from models import UserProfile
+from models import UserProfile, Friend
 from safe_buddy import settings
 from django.contrib.auth.models import User
 
@@ -23,9 +23,8 @@ class SBUserSerializer(serializers.ModelSerializer):
 
   class Meta:
     model = UserProfile
-    fields = ('aceid', 'profile_picture', 'user')
+    fields = ('aceid', 'profile_picture', 'user', 'user_relation', 'user_type')
     user = serializers.Field(source='user.id')
-
 
   def to_representation(self, instance):
       data = super(SBUserSerializer, self).to_representation(instance)
@@ -37,7 +36,6 @@ class SBUserSerializer(serializers.ModelSerializer):
       data.pop('user')
       return data
     
-
 class PasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password_reset_form_class = PasswordResetForm
@@ -58,3 +56,11 @@ class PasswordResetSerializer(serializers.Serializer):
             'request': request,
         }
         self.reset_form.save(**opts)
+
+
+
+class FriendSertializer(serializers.ModelSerializer):
+  friend_profile = SBUserSerializer()
+  class Meta:
+    model = Friend
+    fields = ('friend_profile',)

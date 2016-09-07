@@ -5,10 +5,16 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 
-class UserProfile(models.Model):  
+class UserProfile(models.Model):
     user = models.OneToOneField(User, unique=True)
-    aceid = models.CharField(max_length=10)  
+    aceid = models.CharField(max_length=10)
     profile_picture = models.ImageField(upload_to='static/thumbpath', blank=True)
+    user_type = models.CharField(max_length=30)
+    user_relation = models.CharField(max_length=10)
 
     def __unicode__(self):
         return u'Profile of user: %s' % self.user.username
+
+class Friend(models.Model):
+  user_profile =  models.ForeignKey(UserProfile, blank=False, null=True, on_delete=models.SET_NULL, default=None, related_name='userprofile')
+  friend_profile =  models.ForeignKey(UserProfile, blank=False, null=True, on_delete=models.SET_NULL, default=None,related_name='friendprofile')
