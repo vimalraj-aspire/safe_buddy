@@ -30,3 +30,8 @@ class EmployeeRole(models.Model):
   employee = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
   department = models.ForeignKey(Department, on_delete=models.CASCADE)
   role = models.IntegerField(default=2)
+
+class EmergencyContact(models.Model):
+    employee = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    name = models.CharField(max_length=10)
+    number = models.CharField(max_length=10)

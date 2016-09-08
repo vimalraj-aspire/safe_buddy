@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.forms import PasswordResetForm
-from models import UserProfile, Friend
+from models import UserProfile, Friend, EmergencyContact
 from safe_buddy import settings
 from django.contrib.auth.models import User
 
@@ -11,7 +11,9 @@ class DepartmentSerializer(serializers.ModelSerializer):
   class Meta:
     model = Department
 
-
+class EmergencyContactSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = EmergencyContact
 
 class EmployeeRoleSerializer(serializers.ModelSerializer):
   class Meta:

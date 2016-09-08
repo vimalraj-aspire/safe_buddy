@@ -14,7 +14,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from django.db.models import Q
 from rest_framework import viewsets
-from models import EmployeeRole, Department
+from models import EmployeeRole, Department, EmergencyContact
 from serializers import DepartmentSerializer
 
 @api_view(['GET'])
@@ -181,3 +181,26 @@ def get_employees_by_department(request, department_id):
     profile = UserProfile.objects.get(id=friend.get('employee'))    
     friends_location.append({'aceid':profile.aceid, 'first_name': profile.user.first_name, 'username': profile.user.username, 'user_relation': profile.user_relation, 'user_type': profile.user_type})
   return Response(friends_location)
+
+
+
+
+@api_view(['POST'])
+def create_contact(request):
+  ''' Function to employee to a department'''
+  employee = UserProfile.objects.get(user=request.user)
+
+  EmergencyContact.objects.create(employee=employee,name=request.data.get('name'), number = request.data.get('number'))
+
+  return Response({'status':'success', 'msg':'Emergencey contact has been created'},status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+def list_contacts(request):
+  ''' Function to employee to a department'''
+  employee = UserProfile.objects.get(user=request.user)
+  e_contacts = []
+  for contact in EmergencyContact.objects.filter(employee=employee):
+    e_contacts.append({'name':contact.name, 'number': contact.number})
+
+  return Response(e_contacts)
+

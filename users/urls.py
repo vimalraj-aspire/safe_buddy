@@ -1,14 +1,13 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 
-from views import  SBUserList, DepartmentViewSet, PasswordResetView, get_user, add_trackee, my_trackees, who_are_all_tracking_me, map_employee, get_employees_by_department
+from views import  SBUserList, DepartmentViewSet, PasswordResetView, get_user, add_trackee, my_trackees, who_are_all_tracking_me, map_employee, get_employees_by_department, create_contact, list_contacts
 
 
 department_list = DepartmentViewSet.as_view({
     'get': 'list',
     'post': 'create'
 })
-
 
 urlpatterns = [
     url(r'^users/$', SBUserList.as_view(), name='user-list'),
@@ -20,4 +19,6 @@ urlpatterns = [
     url(r'^departments/$', department_list, name='department-list'),
     url(r'^employee/map/(?P<username>.*)/$', map_employee, name='employee-detail'),
     url(r'^get-employees-by-department/(?P<department_id>.*)/$', get_employees_by_department, name='get-employees-by-department'),
+    url(r'^create-contact/$', create_contact, name='create-contact'),
+    url(r'^list-contacts/$', list_contacts, name='list-contacts'),
 ]
