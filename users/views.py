@@ -13,6 +13,9 @@ from safe_buddy import settings
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from django.db.models import Q
+from rest_framework import viewsets
+from models import EmployeeRole, Department
+from serializers import DepartmentSerializer
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
@@ -52,10 +55,12 @@ class SBUserList(APIView):
         user_seriliazer = UserSerializer(data=user_data)
         if user_seriliazer.is_valid(request.data):
             user  = user_seriliazer.save()
-            request.data['user'] = user.id
+            request.data['user'] = user.id            
             serializer = SBUserSerializer(data=request.data, context=serializer_context)
             if serializer.is_valid():
                 employee = serializer.save()
+                if request.data.get('user_type') == 'EMPLOYEE':
+                    EmployeeRole.objects.create(employee=employee, department= Department.objects.get(pk=request.data.get('department')), role=request.data.get('role'))
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
               user.delete()
@@ -114,11 +119,65 @@ def who_are_all_tracking_me(request):
       return Response(serializer.data)
     else:
       return Response({'status': 'failed', 'msg': 'No trackers found'}, status=status.HTTP_404_NOT_FOUND)
-    # userprofile = UserProfile.objects.get(user=request.user)
-    # trackees = Friend.objects.filter(user_profile=userprofile)
-    # if trackees:
-    #   serializer = FriendSertializer(trackees, many=True)
-    #   return Response(serializer.data)
-    # else:
-    #   return Response({'status': 'faliled', 'msg': 'No trackee found'}, status=status.HTTP_404_NOT_FOUND)
 
+
+class DepartmentViewSet(viewsets.ModelViewSet):
+  def get_objects():
+    '''
+    Function to return data from cache if exists
+    '''
+  serializer_class = DepartmentSerializer
+  queryset =  Department.objects.all()
+
+
+class DepartmentDetailView(APIView):
+  """
+  Retrieve, update or delete a department instance.
+  """
+  def get_object(self, id):
+    try:
+        return Department.objects.get(id=id)
+    except Department.DoesNotExist:
+        raise Http404
+
+  def get(self, request, id, format=None):
+    department = self.get_object(id)
+    serializer = DepartmentSerializer(department)
+    return Response(serializer.data)
+
+  def put(self, request, id, format=None):
+    department = self.get_object(id)
+    serializer = DepartmentSerializer(user, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  def delete(self, request, id, format=None):
+    department = self.get_object(id)
+    department.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+@api_view(['POST'])
+def map_employee(request, username):
+  ''' Function to employee to a department'''
+  employee = UserProfile.objects.get(user__username=username)
+  # if int(request.data.get('role')) == settings.ROLES.get('MANAGER') and EmployeeRole.objects.filter(department= Department.objects.get(pk=request.data.get('department')), role=settings.ROLES.get('MANAGER')):
+  #     return Response({'status': 'failed', 'msg': settings.API_ERRORS.get('TEAM_ALREADY_HAVE_A_MANAGER')}, status=status.HTTP_412_PRECONDITION_FAILED)
+
+  EmployeeRole.objects.create(employee=employee, department=Department.objects.get(pk=request.data.get('department')), role=2)
+
+  return Response({'status':'success', 'msg':'User mapped to a department'},status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+def get_employees_by_department(request, department_id):
+  ''' Function to get location '''  
+  friends = EmployeeRole.objects.filter(department=department_id).values('employee')
+  friends_location = []
+  for friend in friends:
+    profile = UserProfile.objects.get(id=friend.get('employee'))    
+    friends_location.append({'aceid':profile.aceid, 'first_name': profile.user.first_name, 'username': profile.user.username, 'user_relation': profile.user_relation, 'user_type': profile.user_type})
+  return Response(friends_location)

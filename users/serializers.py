@@ -4,6 +4,20 @@ from models import UserProfile, Friend
 from safe_buddy import settings
 from django.contrib.auth.models import User
 
+from models import Department, EmployeeRole
+
+
+class DepartmentSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Department
+
+
+
+class EmployeeRoleSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = EmployeeRole
+    fields = ('department', 'role')
+
 class UserSerializer(serializers.ModelSerializer):
 
   class Meta:
@@ -20,11 +34,14 @@ class UserSerializer(serializers.ModelSerializer):
     return user
 
 class SBUserSerializer(serializers.ModelSerializer):
-
+  department = serializers.SerializerMethodField()
   class Meta:
     model = UserProfile
-    fields = ('aceid', 'profile_picture', 'user', 'user_relation', 'user_type')
+    fields = ('aceid', 'profile_picture', 'user', 'user_relation', 'user_type', 'department')
     user = serializers.Field(source='user.id')
+
+  def get_department(self, userprofile):
+    return EmployeeRole.objects.filter(employee=userprofile).values()
 
   def to_representation(self, instance):
       data = super(SBUserSerializer, self).to_representation(instance)
